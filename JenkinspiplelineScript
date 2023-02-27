@@ -20,7 +20,7 @@ sh "${mavenHome}/bin/mvn deploy"
 
 stage('Deployment')
 sshagent(['391f02c0-a2ee-42d0-971f-6cc1c1d88e6c']) {
-    sh "scp target/ maven-web-application.war ec2-user@172.31.5.136 : /opt/apache-tomcat-9.0.71/webapps
+    sh "scp target/ maven-web-application.war ec2-user@172.31.5.136 : /opt/apache-tomcat-9.0.71/webapps"
 }
 
 }
