@@ -1,0 +1,28 @@
+node{
+echo " the job name is : ${env.JOB_NAME}"
+echo " the build number is : ${env.BUILD_NUMBER}"
+echo " the jenkins home is :  ${JENKINS_HOME}"
+properties([buildDiscarder(logRotator(artifactDaysToKeepStr: '1', artifactNumToKeepStr: '1', daysToKeepStr: '10', numToKeepStr: '2')), [$class: 'JobLocalConfiguration', changeReasonComment: ''], pipelineTriggers([pollSCM('* * * * *')])])  
+stage('checkoutcode'){
+git branch: 'development', url: 'https://github.com/katnekaluva/maven-web-application.git'
+
+}
+stage('BuildStage')
+{
+def mavenHome = tool name: 'mvn-3.9.0'
+sh "${mavenHome}/bin/mvn clean package"
+}
+stage('UploadArtifacts') 
+{
+def mavenHome = tool name: 'mvn-3.9.0'
+sh "${mavenHome}/bin/mvn deploy"
+}
+def mavenHome = tool name: 'mvn-3.9.0'
+
+{
+stage(
+sshagent(['391f02c0-a2ee-42d0-971f-6cc1c1d88e6c']) {
+    sh "scp target/ maven-web-application.war ec2-user@172.31.5.136 : /opt/apache-tomcat-9.0.71/webapps
+}
+
+}
